@@ -11,11 +11,26 @@ export type Entity = {
   data: PlayerData;
 }
 
+export type Input = {
+  timestamp: number;
+  inputState: number;
+}
+
+export type Death = {
+  entityId: number;
+  timestamp: number;
+}
+
 export class ReplayData {
 
   public length: number = -1;
   public results: {
     [entityId: number]: number
+  } = {};
+  public deaths: Death[] = [];
+
+  public inputs: {
+    [entityId: number]: Input[]
   } = {};
 
   public randomSeed: number = -1;
@@ -72,6 +87,68 @@ export class ReplayData {
     data.ReadInt(); // used in checksum
   }
 
+  private readResults(data: BitStream) {
+    this.length = data.ReadInt();
+    const thirdVersionCheck = data.ReadInt();
+
+    if (thirdVersionCheck != this.version) {
+      throw new Error("Third version check does not match first version check");
+    }
+
+    if (data.ReadBoolean()) {
+      this.results = {};
+      while (data.ReadBoolean()) {
+        const entityId = data.ReadBits(5);
+        const result = data.ReadShort();
+        this.results[entityId] = result;
+      }
+    }
+  }
+
+  private readInputs(data: BitStream) {
+    this.inputs = {};
+    while (data.ReadBoolean()) {
+      const entityId = data.ReadBits(5);
+      const inputCount = data.ReadInt();
+
+      if (!this.inputs[entityId]) {
+        this.inputs[entityId] = [];
+      }
+
+      for (let i = 0; i < inputCount; i++) {
+        const timestamp = data.ReadInt();
+        const inputState = data.ReadBoolean() ? data.ReadBits(14) : 0;
+
+        this.inputs[entityId].push({
+          timestamp: timestamp,
+          inputState: inputState
+        });
+      }
+    }
+  }
+
+  private readFaces(data: BitStream, kos: boolean) {
+    if (kos) {
+      this.deaths = [];
+    }
+
+    while (data.ReadBoolean()) {
+      const entityId = data.ReadBits(5);
+      const timestamp = data.ReadInt();
+
+      if (kos) {
+        this.deaths.push({
+          entityId,
+          timestamp
+        });
+      }
+    }
+
+    if (kos) {
+      this.deaths.sort((a, b) => a.timestamp - b.timestamp);
+    }
+  }
+
   private xorData(data: BitStream) {
     const buffer = data.getBuffer();
     for (let i = 0; i < buffer.length; i++) {
@@ -94,6 +171,9 @@ export class ReplayData {
       let state: number = data.ReadBits(3);
 
       switch (state) {
+        case 1:
+          this.readInputs(data);
+          break;
         case 3:
           this.readHeader(data);
           break;
@@ -101,29 +181,20 @@ export class ReplayData {
           this.readPlayerData(data);
           break;
         case 6:
-          this.length = data.ReadInt();
-          const thirdVersionCheck = data.ReadInt();
-
-          if (thirdVersionCheck != this.version) {
-            throw new Error("Third version check does not match first version check");
-          }
-
-          if (data.ReadBoolean()) {
-            this.results = {};
-            while (data.ReadBoolean()) {
-              const entityId = data.ReadBits(5);
-              const result = data.ReadShort();
-              this.results[entityId] = result;
-            }
-          }
+          this.readResults(data);
           break;
-
+        case 5:
+        case 7:
+          this.readFaces(data, state == 5);
+          break;
         default:
           console.log("Unknown state: " + state);
           stop = true;
           break;
       }
     }
+
+    console.log("Finished reading replays...");
   }
 
   public static ReadReplay(data: BitStream): ReplayData {

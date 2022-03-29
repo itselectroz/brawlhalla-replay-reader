@@ -8,4 +8,4 @@ const replayData = new BitStream(readFileSync(replayPath));
 
 const replay = ReplayData.ReadReplay(replayData);
 
-console.log(replay);
+console.log(replay.deaths);
