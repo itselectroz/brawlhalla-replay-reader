@@ -13,6 +13,11 @@ export type Entity = {
 
 export class ReplayData {
 
+  public length: number = -1;
+  public results: {
+    [entityId: number]: number
+  } = {};
+
   public randomSeed: number = -1;
   public version: number = -1;
   public playlistId: number = -1;
@@ -25,7 +30,7 @@ export class ReplayData {
   public heroCount: number = -1; // the number of heroes each player has.
   public entities: Entity[] = [];
 
-  public readHeader(data: BitStream) {
+  private readHeader(data: BitStream) {
     this.randomSeed = data.ReadInt();
     this.version = data.ReadInt();
     this.playlistId = data.ReadInt();
@@ -37,14 +42,44 @@ export class ReplayData {
     this.onlineGame = data.ReadBoolean();
   }
 
-  xorData(data: BitStream) {
+  private readPlayerData(data: BitStream) {
+    this.gameSettings = GameSettings.read(data);
+    this.levelId = data.ReadInt();
+
+    this.heroCount = data.ReadShort();
+
+    this.entities = [];
+
+    while (data.ReadBoolean()) {
+      const entityId = data.ReadInt();
+      const entityName = data.ReadString();
+
+      const playerData = PlayerData.read(data, this.heroCount);
+
+      this.entities.push({
+        id: entityId,
+        name: entityName,
+        data: playerData
+      });
+    }
+
+    let secondVersionCheck = data.ReadInt();
+
+    if (secondVersionCheck != this.version) {
+      throw new Error("Second version check does not match first version check");
+    }
+
+    data.ReadInt(); // used in checksum
+  }
+
+  private xorData(data: BitStream) {
     const buffer = data.getBuffer();
     for (let i = 0; i < buffer.length; i++) {
       buffer[i] ^= XOR_KEY[i % XOR_KEY.length];
     }
   }
 
-  decompress(data: BitStream) {
+  private decompress(data: BitStream) {
     const buffer = data.getBuffer();
     const decompressed = inflateSync(buffer);
     data.setBuffer(decompressed);
@@ -63,35 +98,26 @@ export class ReplayData {
           this.readHeader(data);
           break;
         case 4:
-          this.gameSettings = GameSettings.read(data);
-          this.levelId = data.ReadInt();
-
-          this.heroCount = data.ReadShort();
-
-          this.entities = [];
-
-          while (data.ReadBoolean()) {
-            const entityId = data.ReadInt();
-            const entityName = data.ReadString();
-
-            const playerData = PlayerData.read(data, this.heroCount);
-
-            this.entities.push({
-              id: entityId,
-              name: entityName,
-              data: playerData
-            });
-          }
-
-          let secondVersionCheck = data.ReadInt();
-
-          if (secondVersionCheck != this.version) {
-            throw new Error("Second version check does not match first version check");
-          }
-
-          data.ReadShort(); // used in checksum
-
+          this.readPlayerData(data);
           break;
+        case 6:
+          this.length = data.ReadInt();
+          const thirdVersionCheck = data.ReadInt();
+
+          if (thirdVersionCheck != this.version) {
+            throw new Error("Third version check does not match first version check");
+          }
+
+          if (data.ReadBoolean()) {
+            this.results = {};
+            while (data.ReadBoolean()) {
+              const entityId = data.ReadBits(5);
+              const result = data.ReadShort();
+              this.results[entityId] = result;
+            }
+          }
+          break;
+
         default:
           console.log("Unknown state: " + state);
           stop = true;
