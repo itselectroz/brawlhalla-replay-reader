@@ -1,0 +1,27 @@
+{
+  "name": "brawlhalla-replay-reader",
+  "version": "1.0.0",
+  "description": "A simple reader for Brawlhalla replay files",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "npm run build && node dist/test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/itselectroz/brawlhalla-replay-reader.git"
+  },
+  "author": "Harry Whittle",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/itselectroz/brawlhalla-replay-reader/issues"
+  },
+  "homepage": "https://github.com/itselectroz/brawlhalla-replay-reader#readme",
+  "devDependencies": {
+    "@types/node": "^17.0.23",
+    "typescript": "^4.6.3"
+  },
+  "dependencies": {
+    "brawlhalla-networking": "file:../brawlhalla-networking"
+  }
+}
