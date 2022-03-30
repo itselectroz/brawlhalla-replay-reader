@@ -5,6 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
+    "prepublish": "npm run build",
     "test": "npm run build && node dist/test.js"
   },
   "repository": {

@@ -166,8 +166,7 @@ export class ReplayData {
     this.decompress(data);
     this.xorData(data);
 
-    let stop = false;
-    while (data.getReadBytesAvailable() > 0 && !stop) {
+    while (data.getReadBytesAvailable() > 0) {
       let state: number = data.ReadBits(3);
 
       switch (state) {
@@ -188,18 +187,14 @@ export class ReplayData {
           this.readFaces(data, state == 5);
           break;
         default:
-          console.log("Unknown state: " + state);
-          stop = true;
-          break;
+          throw new Error("Unknown replay read state: " + state);
       }
     }
-
-    console.log("Finished reading replays...");
   }
 
-  public static ReadReplay(data: BitStream): ReplayData {
+  public static ReadReplay(data: Buffer): ReplayData {
     const replay = new ReplayData();
-    replay.read(data);
+    replay.read(new BitStream(data));
     return replay;
   }
 }
