@@ -166,12 +166,16 @@ export class ReplayData {
     this.decompress(data);
     this.xorData(data);
 
-    while (data.getReadBytesAvailable() > 0) {
+    let stop = false;
+    while (data.getReadBytesAvailable() > 0 && !stop) {
       let state: number = data.ReadBits(3);
 
       switch (state) {
         case 1:
           this.readInputs(data);
+          break;
+        case 2:
+          stop = true;
           break;
         case 3:
           this.readHeader(data);

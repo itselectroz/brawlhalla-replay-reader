@@ -1,5 +1,11 @@
 # brawlhalla-replay-reader
+
 A simple repo for reading Brawlhalla replay data.
+
+## Table of Contents
+
+- [Installation](#installation)
+- [Usage](#usage)
 
 ## Installation
 
@@ -10,7 +16,7 @@ Firstly, ensure you have the lastest version of [node.js](https://nodejs.org/en/
 In your project directory simply run:
 `npm i https://github.com/itselectroz/brawlhalla-replay-reader`
 
-If you want to only install the CLI tool, run:
+If you want to globally install the CLI tool, run:
 `npm i -g https://github.com/itselectroz/brawlhalla-replay-reader`
 
 ### From Source
@@ -32,7 +38,7 @@ Before finally building the project!
 `npm run build`
 
 You can now either install this project into other projects:
-`npm i /source/to/cloned/project`
+`npm i /path/to/cloned/project`
 
 Or use the CLI from within this project directory using the usage instructions below!
 
@@ -40,7 +46,31 @@ Or use the CLI from within this project directory using the usage instructions b
 
 ### CLI Tool
 
-WIP
+Assuming the tool has been installed globally, you can run the tool using:
+
+`replay-reader -h`
+
+This will give you a brief help page.
+
+In order to export your latest replay simply run:
+
+`replay-reader export latest`
+
+This will write an export of your latest replay to replay.json.
+
+To export a select replay simply replace latest with the name of the file (with or without the .replay extension) (Make sure to add quotation marks!)
+
+`replay-reader export "[6.05] ShipreckFalls"`
+
+To specify the output directory use the `--out` or `-o` option:
+
+`replay-reader export -o out.json latest`
+
+This will write the output to `out.json`!
+
+To specify a custom Brawlhalla replays directory use the `--dir` or `-d` option:
+
+`replay-reader export -d C:/BrawlhallaReplays/ latest`
 
 ### In your project
 
