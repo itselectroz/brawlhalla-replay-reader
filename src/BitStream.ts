@@ -1,10 +1,5 @@
 const MASKS = [0, 1, 3, 7, 15, 31, 63, 127, 255, 511, 1023, 2047, 4095, 8191, 16383, 32767, 65535, 131071, 262143, 524287, 1048575, 2097151, 4194303, 8388607, 16777215, 33554431, 67108863, 134217727, 268435455, 536870911, 1073741823, 2147483647, -1];
 
-enum ENDIANNESS {
-  LITTLE_ENDIAN = 0,
-  BIG_ENDIAN = 1
-}
-
 export class BitStream {
   private data: Buffer;
   private readOffset: number = 0;
@@ -156,13 +151,5 @@ export class BitStream {
 
   public WriteBoolean(value: boolean) {
     this.WriteBits(value ? 1 : 0, 1);
-  }
-
-  private swap16(value: number) {
-    return ((value & 0xFF) << 8) | ((value >> 8) & 0xFF);
-  }
-
-  private swap32(value: number) {
-    return ((value & 0xFF) << 24) | ((value & 0xFF00) << 8) | ((value >> 8) & 0xFF00) | ((value >> 24) & 0xFF);
   }
 }
