@@ -2,7 +2,7 @@
 
 [![Version](https://img.shields.io/npm/v/brawlhalla-replay-reader.svg?style=flat-square)](https://www.npmjs.com/package/brawlhalla-replay-reader)
 [![Downloads](https://img.shields.io/npm/dt/brawlhalla-replay-reader.svg?style=flat-square)](https://www.npmjs.com/package/brawlhalla-replay-reader)
-[![License](https://img.shields.io/github/license/brawlhalla-replay-reader/vdf.svg?style=flat-square)](https://www.npmjs.com/package/brawlhalla-replay-reader)
+[![License](https://img.shields.io/github/license/itselectroz/brawlhalla-replay-reader.svg?style=flat-square)](https://www.npmjs.com/package/brawlhalla-replay-reader)
 
 **brawlhalla-replay-reader** is a module for parsing replay files for [Brawlhalla](https://www.brawlhalla.com/).
 
