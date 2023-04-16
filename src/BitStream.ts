@@ -1,4 +1,9 @@
-const MASKS = [0, 1, 3, 7, 15, 31, 63, 127, 255, 511, 1023, 2047, 4095, 8191, 16383, 32767, 65535, 131071, 262143, 524287, 1048575, 2097151, 4194303, 8388607, 16777215, 33554431, 67108863, 134217727, 268435455, 536870911, 1073741823, 2147483647, -1];
+const MASKS = [
+  0, 1, 3, 7, 15, 31, 63, 127, 255, 511, 1023, 2047, 4095, 8191, 16383, 32767,
+  65535, 131071, 262143, 524287, 1048575, 2097151, 4194303, 8388607, 16777215,
+  33554431, 67108863, 134217727, 268435455, 536870911, 1073741823, 2147483647,
+  -1,
+];
 
 export class BitStream {
   private data: Buffer;
@@ -19,12 +24,24 @@ export class BitStream {
     this.data = data;
   }
 
+  public setReadOffset(offset: number) {
+    this.readOffset = offset;
+  }
+
+  public setWriteOffset(offset: number) {
+    this.writeOffset = offset;
+  }
+
   public getReadBytesAvailable() {
     return (this.data.length * 8 - this.readOffset) >>> 3;
   }
 
   public getWriteBytesAvailable() {
     return (this.data.length * 8 - this.writeOffset) >>> 3;
+  }
+
+  public shrink() {
+    this.data = this.data.slice(0, Math.ceil(this.writeOffset / 8) + 1);
   }
 
   public ReadBits(count: number): number {
@@ -83,7 +100,7 @@ export class BitStream {
 
   public ReadString(): string {
     const length = this.ReadShort();
-    return this.ReadByteList(length).toString('utf-8');
+    return this.ReadByteList(length).toString("utf-8");
   }
 
   public ReadBoolean(): boolean {
@@ -100,8 +117,7 @@ export class BitStream {
       let bitsToWrite;
       if (count < bitsRemaining) {
         bitsToWrite = count;
-      }
-      else {
+      } else {
         bitsToWrite = bitsRemaining;
       }
 
@@ -144,7 +160,7 @@ export class BitStream {
   }
 
   public WriteString(value: string) {
-    const buffer = Buffer.from(value, 'utf-8');
+    const buffer = Buffer.from(value, "utf-8");
     this.WriteShort(buffer.length);
     this.WriteByteList(buffer);
   }

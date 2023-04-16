@@ -1,23 +1,21 @@
-import { readFileSync } from "fs";
+import { readFileSync, writeFileSync } from "fs";
 import { homedir } from "os";
-import { ReplayData } from ".";
+import { BitStream, ReplayData } from ".";
 
-const replayName = "[6.05] VoidMinor.replay";
-const replayPath = homedir() + `/BrawlhallaReplays/${replayName}`;
+const replayDir = homedir() + `/BrawlhallaReplays`;
+const inPath = `${replayDir}/7.06_ShipwreckFalls_32.replay`;
+// const inPath = `${replayDir}/[7.06] SmallGreatHall.replay`;
+const outPath = `${replayDir}/out.replay`;
 
-const replayData = readFileSync(replayPath);
+const replayData = readFileSync(inPath);
 
-const replay = ReplayData.ReadReplay(replayData);
+const replay = new ReplayData();  
+const stream = new BitStream(replayData);
 
-console.log(replay.entities[0].data);
+replay.read(stream);
 
-// const entities = replay.entities;
+replay.entities.forEach(ent => ent.data.colourId = 64)
 
-// for (const death of replay.deaths) {
-//   const entity = entities.find((e) => e.id == death.entityId);
-//   if (!entity) {
-//     throw new Error(`Unable to find entity with id ${death.entityId}`);
-//   }
+writeFileSync(outPath, replay.write());
 
-//   console.log(`${entity.name} died at ${death.timestamp / 1000}s`);
-// }
+ReplayData.ReadReplay(readFileSync(outPath))

@@ -14,7 +14,10 @@ export class HeroData {
   }
 
   write(data: BitStream) {
-    
+    data.WriteInt(this.heroId);
+    data.WriteInt(this.costumeId);
+    data.WriteInt(this.stance);
+    data.WriteInt(this.weaponSkins);
   }
 
   static read(data: BitStream): HeroData {
