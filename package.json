@@ -1,6 +1,6 @@
 {
   "name": "brawlhalla-replay-reader",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A module/CLI tool for parsing replay files for Brawlhalla",
   "main": "dist/index.js",
   "scripts": {
