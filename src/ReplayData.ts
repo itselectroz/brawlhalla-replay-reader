@@ -179,7 +179,7 @@ export class ReplayData {
     data.WriteInt(this.version);
 
     data.WriteBoolean(!!this.results);
-    if (!!this.results) {
+    if (this.results) {
       const entities: number[] = Object.keys(this.results) as any;
 
       for (const entityId of entities) {
@@ -298,9 +298,6 @@ export class ReplayData {
     while (data.getReadBytesAvailable() > 0 && !stop) {
       let state: number = data.ReadBits(3);
       this.stateOrder.push(state);
-
-      console.log(`State: ${state}`);
-
       switch (state) {
         case 1:
           this.readInputs(data);
@@ -328,7 +325,7 @@ export class ReplayData {
   }
 
   public write(stream?: BitStream): Buffer {
-    if (!!stream) {
+    if (stream) {
       this.xorData(stream);
       this.compress(stream);
 
@@ -340,7 +337,6 @@ export class ReplayData {
 
     let stop = false;
     for (let state of this.stateOrder) {
-      console.log(`Writing state: ${state}`);
       data.WriteBits(state, 3);
 
       switch (state) {

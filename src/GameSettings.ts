@@ -11,6 +11,8 @@ export class GameSettings {
   gameSpeed: number = -1;
   damageRatio: number = -1;
   levelSetID: number = -1;
+  unknown: number = -1;
+  unknown2: number = -1;
 
   read(data: BitStream) {
     this.flags = data.ReadInt();
@@ -23,6 +25,8 @@ export class GameSettings {
     this.gameSpeed = data.ReadInt();
     this.damageRatio = data.ReadInt();
     this.levelSetID = data.ReadInt();
+    this.unknown = data.ReadInt();
+    this.unknown2 = data.ReadInt();
   }
 
   write(data: BitStream) {
@@ -36,6 +40,8 @@ export class GameSettings {
     data.WriteInt(this.gameSpeed);
     data.WriteInt(this.damageRatio);
     data.WriteInt(this.levelSetID);
+    data.WriteInt(this.unknown);
+    data.WriteInt(this.unknown2);
   }
 
   static read(data: BitStream): GameSettings {
